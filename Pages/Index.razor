@@ -1,0 +1,24 @@
+﻿@page "/"
+@page "/index"
+@page "/index/{id:int}"
+@inject ILogger<Index> _logger
+
+
+<ul>
+    <li>ID: @Id</li>
+    <li>QueryParam: @QueryParamProperty</li>
+</ul>
+<a href="/index?queryparam=abc">queryparam=def</a>
+<a href="/index/999">/999</a>
+
+@code {
+    [Parameter] public int Id { get; set; }
+    [Parameter, SupplyParameterFromQuery(Name = "queryparam")] public string? QueryParamProperty { get; set; }
+
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        await base.SetParametersAsync(parameters);
+        _logger.LogInformation($"SetParametersAsync Id:{Id}, QueryParam:{QueryParamProperty}");
+    }
+}

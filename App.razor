@@ -1,0 +1,36 @@
+﻿@using System.Security.Claims
+@using System.Reflection
+
+@inject IConfiguration Config
+<CascadingAuthenticationState>
+<Router AppAssembly="@typeof(Program).Assembly" OnNavigateAsync="OnNavigateAsyncHandler">
+    <Found Context="routeData">
+        <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+        </AuthorizeRouteView>
+        <FocusOnNavigate RouteData="@routeData" Selector="[data-action=search]" />
+    </Found>
+    <NotFound>
+    </NotFound>
+
+</Router>
+</CascadingAuthenticationState>
+@code {
+    [Inject] NavigationManager NavigationManager { get; set; } = default!;
+    [Inject] AuthenticationStateProvider AuthenticationStateProvider { get; set; } = default!;
+    [Inject] ILogger<App> Logger { get; set; } = default!;
+
+    
+    protected override async Task OnInitializedAsync()
+    {
+        ClaimsPrincipal user = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User;
+        await Task.Delay(100);
+
+        await base.OnInitializedAsync();
+    }
+
+    void OnNavigateAsyncHandler(NavigationContext context)
+    {
+        Logger?.LogInformation("OnNavigateAsync to '{Path}'", context.Path);
+    }
+
+}
